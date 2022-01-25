@@ -9,6 +9,7 @@ require './modules/standard_messages'
 require './modules/response'
 require './modules/callback_messages'
 require './modules/assets/inline_button'
+require '../modules/security'
 
 
 # basic class of the app
