@@ -3,6 +3,6 @@
 class BirthdayBot
   # This module assigned to creating InlineKeyboardButton
   module InlineButton
-    GET_BIRTHDAY = Telegram::Bot::Types::InlineKeyboardButton.new(text: 'Дни рождения', callback_data: 'birthdays')
+    GET_BIRTHDAY = Telegram::Bot::Types::InlineKeyboardButton.new(text: 'Дни рождения', callback_data: 'birthday')
   end
 end
