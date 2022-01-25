@@ -1,6 +1,9 @@
+# frozen_string_literal: true
+
 require 'telegram/bot'
 require '../lib/keys'
 
+# basic class of the app
 class BirthdayBot
   include Database
   def initialize
