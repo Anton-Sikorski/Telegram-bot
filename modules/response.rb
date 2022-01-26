@@ -56,8 +56,20 @@ class BirthdayBot
         )
       end
 
+      def delete_message(message_id, chat_id: false)
+        chat = defined?(Listener.message.chat.id) ? Listener.message.chat.id : Listener.message.message.chat.id
+        chat = chat_id if chat_id
+
+        Listener.bot.api.deleteMessage(
+          chat_id: chat,
+          message_id: message_id,
+          parse_mode: 'html'
+        )
+      end
+
       module_function(
         :std_message,
+        :delete_message,
         :generate_inline_markup,
         :inline_message,
         :force_reply_message

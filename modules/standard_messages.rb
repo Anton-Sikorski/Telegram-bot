@@ -35,6 +35,15 @@ class BirthdayBot
         )
       end
 
+      def confirm
+        Response.inline_message 'Сохраняем?', Response.generate_inline_markup(
+          [
+            InlineButton::CONFIRM_SAVE,
+            InlineButton::DECLINE_SAVE
+          ]
+        )
+      end
+
       def set_birthday(user_id = @user_id)
 
         if @message == '/reset'
@@ -52,30 +61,17 @@ class BirthdayBot
           State.replace({ user_id: user_id, name: nil, date: nil, state: STATES[0] })
           Response.std_message 'Сообщи мне имя именинника'
         when STATES[0]
-          return Response.std_message 'Invalid name' unless @message.match(/\w+/)
-
           State.replace({ user_id: user_id, name: @message, date: nil, state: STATES[1] })
           Response.std_message 'Сообщи мене дату в формате дд/мм/гггг'
         when STATES[1]
-          return Response.std_message 'Invalid date' unless @message.match(%r{\d\d/\d\d/\d\d\d\d})
-
+          unless @message.match(%r{\d\d/\d\d/\d\d\d\d}) || @message.match(/\d\d.\d\d.\d\d\d\d/)
+            return Response.std_message 'Неверный формат'
+          end
           data = { user_id: user_id, name: State.check_state(user_id)[:name], date: @message, state: STATES[2] }
           State.replace(data)
-          Response.std_message "Got: name - #{data[:name]}, birth date - #{data[:date]}\nSaving?(y/n)"
+          Response.std_message "Вот что имеем: Имя - #{data[:name]}, дата рождения - #{data[:date]}\nВсё правильно?\n"
         when STATES[2]
-          return unless @message == 'y' || @message == 'n'
-
-          case @message
-          when 'y'
-            data = State.check_state(user_id)
-            Database.save(user_id: user_id, name: data[:name], date: data[:date])
-            Response.std_message 'Saved!'
-            State.replace({ user_id: user_id, name: data[:name], date: data[:date], state: STATES[3] })
-          when 'n'
-            State.replace({ user_id: user_id, name: nil, date: nil, state: STATES[0] })
-          else
-            Response.std_message 'Invalid input'
-          end
+          confirm
         else
           Response.std_message 'invalid answer'
         end
@@ -93,6 +89,7 @@ class BirthdayBot
       module_function(
         :process,
         :birthdays,
+        :confirm,
         :plug_message,
         :set_birthday,
         :start
