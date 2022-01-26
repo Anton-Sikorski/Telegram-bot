@@ -8,10 +8,9 @@ class BirthdayBot
 
       def process
         @message = Listener.message.text
-        @user_id = Listener.message.from.id
-        State.save({ user_id: @user_id, name: nil, date: nil, state: STATES[3] }) if State.check_state(@user_id).nil?
+        State.save({ user_id: user_id, name: nil, date: nil, state: STATES[3] }) if State.check_state(user_id).nil?
 
-        if State.check_state(@user_id)[:state] != STATES[3]
+        if State.check_state(user_id)[:state] != STATES[3]
           set_birthday
         else
           case @message
@@ -44,10 +43,10 @@ class BirthdayBot
         )
       end
 
-      def set_birthday(user_id = @user_id)
+      def set_birthday
 
         if @message == '/reset'
-          State.replace({ user_id: user_id, name: nil, date: nil, state: STATES[3] })
+          change_state
           return Response.std_message 'Отменяем запись'
         end
 
@@ -56,17 +55,17 @@ class BirthdayBot
 
         case state
         when STATES[3]
-          State.replace({ user_id: user_id, name: nil, date: nil, state: STATES[0] })
+          change_state(STATES[0])
           Response.std_message 'Сообщи мне имя именинника'
         when STATES[0]
-          State.replace({ user_id: user_id, name: @message, date: nil, state: STATES[1] })
+          change_state(STATES[1], @message)
           Response.std_message 'Сообщи мене дату в формате дд/мм/гггг'
         when STATES[1]
-          return Response.std_message 'Неверный формат' unless @message.match(/\d\d.\d\d.\d\d\d\d/)
+          return Response.std_message 'Неверный формат. Попробуй ещё!' unless @message.match(/\d{2}.\d{2}.\d{4}/)
 
-          data = { user_id: user_id, name: State.check_state(user_id)[:name], date: @message, state: STATES[2] }
-          State.replace(data)
-          Response.std_message "Вот что имеем:\n Имя - #{data[:name]}, дата рождения - #{data[:date]}\n"
+          data = { name: State.check_state(user_id)[:name], date: @message }
+          change_state(STATES[2], State.check_state(user_id)[:name], @message)
+          Response.std_message "Вот что имеем:\nИмя - #{data[:name]}, дата рождения - #{data[:date]}\n"
           confirm
         end
       end
@@ -79,10 +78,20 @@ class BirthdayBot
         Response.std_message 'Первый раз такое слышу, попробуй сказать что-то другое!'
       end
 
+      def change_state(state = STATES[3], name = nil, date = nil )
+        State.replace({ user_id: user_id, name: name, date: date, state: state })
+      end
+
+      def user_id
+        Listener.message.from.id
+      end
+
       module_function(
         :process,
         :birthdays,
         :confirm,
+        :user_id,
+        :change_state,
         :plug_message,
         :set_birthday,
         :start
