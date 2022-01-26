@@ -35,7 +35,6 @@ module State
   end
 
   def replace(data)
-
     db.execute(
       "REPLACE INTO #{TABLE_NAME} (user_id, name, date, state)
       VALUES (?, ?, ?, ?)", [data[:user_id], data[:name], data[:date], data[:state]]

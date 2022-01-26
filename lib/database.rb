@@ -42,11 +42,7 @@ module Database
   end
 
   def select(user_id)
-    data = []
-    db.execute("select * from #{TABLE_NAME} where user_id = #{user_id}") do |row|
-      data << row
-    end
-    data
+    db.execute("select * from #{TABLE_NAME} where user_id = #{user_id}").map { |row| row }
   end
 
   # Get all from the selected table
