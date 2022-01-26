@@ -53,8 +53,6 @@ class BirthdayBot
 
         pp State.check_state(user_id)
         state = State.check_state(user_id).empty? ? nil : State.check_state(user_id)[:state]
-        print "#{state} : state}\n"
-
 
         case state
         when STATES[3]
@@ -64,16 +62,12 @@ class BirthdayBot
           State.replace({ user_id: user_id, name: @message, date: nil, state: STATES[1] })
           Response.std_message 'Сообщи мене дату в формате дд/мм/гггг'
         when STATES[1]
-          unless @message.match(%r{\d\d/\d\d/\d\d\d\d}) || @message.match(/\d\d.\d\d.\d\d\d\d/)
-            return Response.std_message 'Неверный формат'
-          end
+          return Response.std_message 'Неверный формат' unless @message.match(/\d\d.\d\d.\d\d\d\d/)
+
           data = { user_id: user_id, name: State.check_state(user_id)[:name], date: @message, state: STATES[2] }
           State.replace(data)
-          Response.std_message "Вот что имеем: Имя - #{data[:name]}, дата рождения - #{data[:date]}\nВсё правильно?\n"
-        when STATES[2]
+          Response.std_message "Вот что имеем:\n Имя - #{data[:name]}, дата рождения - #{data[:date]}\n"
           confirm
-        else
-          Response.std_message 'invalid answer'
         end
       end
 
@@ -84,7 +78,6 @@ class BirthdayBot
       def plug_message
         Response.std_message 'Первый раз такое слышу, попробуй сказать что-то другое!'
       end
-
 
       module_function(
         :process,

@@ -11,7 +11,6 @@ class BirthdayBot
         case Listener.message.data
         when 'birthday'
           birthday
-          # Listener::Response.std_message('Нету записей(')
         when 'set_birthday'
           Listener::StandardMessages.set_birthday
         when 'reset'
@@ -36,25 +35,21 @@ class BirthdayBot
 
       def save_data(user_id = Listener.message.from.id)
         data = State.check_state(user_id)
+        # save data into main database
         Database.save(user_id: user_id, name: data[:name], date: data[:date])
         Response.std_message 'Успех!'
-        State.replace({ user_id: user_id, name: data[:name], date: data[:date], state: StandardMessages::STATES[3] })
+        # resetting status of user
+        State.replace({ user_id: user_id, name: nil, date: nil, state: StandardMessages::STATES[3] })
         Response.delete_message(message_id)
-      end
-
-      def chat_id
-        Listener.message.message.chat.id
       end
 
       def message_id
         Listener.message.message.message_id
       end
 
-
       module_function(
         :process,
         :save_data,
-        :chat_id,
         :message_id,
         :birthday,
         :callback_message,
