@@ -10,7 +10,7 @@ class BirthdayBot
         self.callback_message = Listener.message.message
         case Listener.message.data
         when 'birthday'
-          Listener::Response.std_message "Все записи: #{Database.select}" # Listener::Response.std_message('Нету записей(')
+          Listener::Response.std_message "Все записи: #{Database.select(Listener.message.from.id)}" # Listener::Response.std_message('Нету записей(')
         end
       end
 

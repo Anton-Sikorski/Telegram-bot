@@ -17,7 +17,7 @@ class BirthdayBot
       def inline_message(message, inline_markup, editless: false, chat_id: false)
         chat = defined?(Listener.message.chat.id) ? Listener.message.chat.id : Listener.message.message.chat.id
         chat = chat_id if chat_id
-        
+
         if editless
           return Listener.bot.api.edit_message_text(
             chat_id: chat,
@@ -27,7 +27,7 @@ class BirthdayBot
             reply_markup: inline_markup
           )
         end
-        
+
         Listener.bot.api.send_message(
           chat_id: chat,
           parse_mode: 'html',

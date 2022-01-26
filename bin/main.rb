@@ -9,14 +9,16 @@ require './modules/response'
 require './modules/callback_messages'
 require './modules/assets/inline_button'
 require './modules/security'
-
+require './lib/state'
 
 # basic class of the app
 class BirthdayBot
   include Database
+  include State
   def initialize
     super
     # Initialize BD
+    State.setup
     Database.setup
     # Establishing webhook via @gem telegram/bot, using API-KEY
     begin
