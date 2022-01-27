@@ -44,7 +44,6 @@ class BirthdayBot
       end
 
       def set_birthday
-
         if @message == '/reset'
           change_state
           return Response.std_message 'Отменяем запись'
@@ -78,7 +77,7 @@ class BirthdayBot
         Response.std_message 'Первый раз такое слышу, попробуй сказать что-то другое!'
       end
 
-      def change_state(state = STATES[3], name = nil, date = nil )
+      def change_state(state = STATES[3], name = nil, date = nil)
         State.replace({ user_id: user_id, name: name, date: date, state: state })
       end
 
