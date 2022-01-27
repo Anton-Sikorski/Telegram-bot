@@ -14,7 +14,7 @@ class BirthdayBot
           set_birthday
         else
           case @message
-          when '/start'
+          when '/start' || 'Привет'
             start
           when '/stop'
             Response.std_message 'Пока!'
@@ -60,10 +60,10 @@ class BirthdayBot
           change_state(STATES[1], @message)
           Response.std_message 'Сообщи мене дату в формате дд/мм/гггг'
         when STATES[1]
-          return Response.std_message 'Неверный формат. Попробуй ещё!' unless @message.match(/\d{2}.\d{2}.\d{4}/)
+          return Response.std_message 'Попробуй ещё!' unless valid_message?(@message)
 
           data = { name: State.check_state(user_id)[:name], date: @message }
-          change_state(STATES[2], State.check_state(user_id)[:name], @message)
+          change_state(STATES[2], State.check_state(user_id)[:name], @message.gsub('.', '/'))
           Response.std_message "Вот что имеем:\nИмя - #{data[:name]}, дата рождения - #{data[:date]}\n"
           confirm
         end
@@ -85,9 +85,33 @@ class BirthdayBot
         Listener.message.from.id
       end
 
+      def valid_message?(message)
+        return false unless message.match(%r{^\d{2}[./-]\d{2}[./-]\d{4}})
+
+        # Response.std_message 'Неверный формат. Попробуй ещё!'
+        day, months, year = message.gsub('.', '/').split('/').map(&:to_i)
+        if day > 31 || day < 1
+          Response.std_message 'Неверно указан день.'
+          return false
+        end
+
+        if months > 12 || months < 1
+          Response.std_message 'Неверно указан месяц.'
+          return false
+        end
+
+        if year > 2022 || year < 1921
+          Response.std_message 'Неверно указан год.'
+          return false
+        end
+
+        true
+      end
+
       module_function(
         :process,
         :birthdays,
+        :valid_message?,
         :confirm,
         :user_id,
         :change_state,
