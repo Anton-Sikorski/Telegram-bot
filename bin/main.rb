@@ -10,6 +10,7 @@ require './modules/callback_messages'
 require './modules/assets/inline_button'
 require './modules/security'
 require './lib/state'
+require '../workers/remind_worker'
 
 # basic class of the app
 class BirthdayBot
@@ -33,6 +34,11 @@ class BirthdayBot
     Telegram::Bot::Client.run(TelegramOrientedInfo::API_KEY) do |bot|
       # Start time variable, for exclude message what was sends before bot starts
       start_bot_time = Time.now.to_i
+      # bot.api.send_message(
+      #   parse_mode: 'html',
+      #   chat_id: 276_510_840,
+      #   text: start_bot_time.to_s
+      # )
       # Active socket listener
       bot.listen do |message|
         # Processing the new income message    #if that message sent after bot run.

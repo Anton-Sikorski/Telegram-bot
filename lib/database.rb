@@ -27,7 +27,7 @@ module Database
 
   def setup
     # Initializing database file
-    self.db = SQLite3::Database.open './lib/development.db'
+    self.db = SQLite3::Database.open '../lib/development.db'
 
     # Try to get custom table, if table not exists - create this one
     Create.database unless get_table(TABLE_NAME)
