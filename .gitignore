@@ -1,3 +1,4 @@
 /.idea/
 /lib/keys.rb
 /lib/development.db
+/workers/config/.session.key
