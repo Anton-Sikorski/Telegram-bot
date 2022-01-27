@@ -3,7 +3,6 @@
 require 'sidekiq'
 require_relative 'config'
 
-
 # sends reminding messages
 class RemindWorker
   include Sidekiq::Worker
