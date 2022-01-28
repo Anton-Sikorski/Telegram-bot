@@ -2,16 +2,17 @@
 
 require 'telegram/bot'
 require './lib/keys'
-require './modules/listener'
+require './lib/state'
 require './lib/database'
-require './modules/standard_messages'
-require './workers/remind_worker'
+require './modules/listener'
 require './modules/response'
+require './modules/security'
+require './modules/add_birthday'
+require './workers/remind_worker'
+require './modules/standard_messages'
 require './modules/callback_messages'
 require './modules/assets/inline_button'
 require './modules/assets/keyboard_button'
-require './modules/security'
-require './lib/state'
 
 # basic class of the app
 class BirthdayBot

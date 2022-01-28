@@ -72,6 +72,10 @@ class BirthdayBot
         )
       end
 
+      def remove_keyboard
+        Telegram::Bot::Types::ReplyKeyboardRemove.new(remove_keyboard: true)
+      end
+
       def chat_id_defined?
         defined?(Listener.message.chat.id) ? Listener.message.chat.id : Listener.message.message.chat.id
       end
@@ -80,6 +84,7 @@ class BirthdayBot
         :std_message,
         :delete_message,
         :chat_id_defined?,
+        :remove_keyboard,
         :generate_inline_markup,
         :generate_keyboard_markup,
         :inline_message,

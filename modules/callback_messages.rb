@@ -12,10 +12,12 @@ class BirthdayBot
         when 'birthday'
           birthday
         when 'set_birthday'
-          Listener::StandardMessages.set_birthday
+          Listener::AddBirthday.set_birthday
         when 'reset'
-          State.replace({ user_id: Listener.message.from.id, name: nil, date: nil, state: StandardMessages::ADD_STATES[3] })
+          State.replace({ user_id: Listener.message.from.id, name: nil, date: nil,
+                          state: AddBirthday::ADD_STATES[3] })
           Response.delete_message(message_id)
+          StandardMessages.start
         when 'save_data'
           save_data
           StandardMessages.start
@@ -46,7 +48,7 @@ class BirthdayBot
         Database.save(user_id: user_id, name: data[:name], date: data[:date])
         Response.std_message 'Успех!'
         # resetting status of user
-        State.replace({ user_id: user_id, name: nil, date: nil, state: StandardMessages::ADD_STATES[3] })
+        State.replace({ user_id: user_id, name: nil, date: nil, state: AddBirthday::ADD_STATES[3] })
         Response.delete_message(message_id)
       end
 
