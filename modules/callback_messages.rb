@@ -31,7 +31,7 @@ class BirthdayBot
           Listener::Response.std_message('Вы пока не добавили ни одной записи!')
         else
           answer = String.new
-          data.each do |record|
+          data.sort { |a, b| time_diff(a[2]) <=> time_diff(b[2]) }.each do |record|
             answer += "День рождения #{record[1]} - #{record[2]}.\n"
           end
           Listener::Response.std_message "Все записи: \n#{answer}"
@@ -60,13 +60,17 @@ class BirthdayBot
         if user_data.empty?
           Listener::Response.std_message('Вы пока не добавили ни одной записи!')
         else
-          answer = ''
-          user_data.map do |record|
-            days_left = (Date.parse(record[:date].gsub(/\d{4}/, '2022')) - Date.parse(Time.now.to_s)).to_i
+          answer = String.new
+          user_data.sort { |a, b| time_diff(a[:date]) <=> time_diff(b[:date]) }.map do |record|
+            days_left = time_diff(record[:date])
             answer += "У #{record[:name]} через #{days_left} дней День Рождения!\n"
           end
           Listener::Response.std_message answer
         end
+      end
+
+      def time_diff(date)
+        (Date.parse(date.gsub(/\d{4}/, '2022')) - Date.parse(Time.now.to_s)).to_i
       end
 
       module_function(
@@ -75,6 +79,7 @@ class BirthdayBot
         :message_id,
         :birthday,
         :check_dates,
+        :time_diff,
         :callback_message,
         :callback_message=
       )

@@ -51,7 +51,7 @@ class BirthdayBot
       def set_birthday
         if @message == '/reset'
           change_state
-          return Response.std_message 'Отменяем запись'
+          return Response.std_message 'Запись отменена'
         end
 
         state = State.check_state(user_id).empty? ? nil : State.check_state(user_id)[:state]
