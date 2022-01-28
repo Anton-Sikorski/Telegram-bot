@@ -18,29 +18,40 @@ class RemindWorker
     Telegram::Bot::Client.run(TelegramOrientedInfo::API_KEY) do |bot|
       users.each do |user_id|
         user_data = Database.select(user_id).map { |record| { id: user_id, name: record[1], date: record[2] } }
-        answer = ''
-        user_data.map do |record|
-          record[:date] = record[:date].gsub('.', '/')
-          answer += "У #{record[:name]} через #{diff(record[:date])} дней День Рождения!\n"
-        end
-        bot.api.send_message(
-          parse_mode: 'html',
-          chat_id: user_id,
-          text: answer
-        )
+        answer = user_data.map { |record|
+          puts days_left = diff(record[:date])
+          respond(record[:name], days_left)
+        }.compact.join('\n')
+
+        pp answer
+
+        # unless answer.empty?
+        #   bot.api.send_message(
+        #     parse_mode: 'html',
+        #     chat_id: user_id,
+        #     text: answer
+        #   )
+        # end
       end
     end
-    # user_data = users.map do |user_id|
-    #   pp record = Database.select(user_id)
-    #   #{ id: user_id, name: record[1], date: record[2] }
-    # end
+  end
 
-    # users.each do |user_id|
-    #   pp user_data #.find_all { |record| record[:id] == user_id }
-    # end
+  def respond(name, days)
+    case days
+    when 30
+      "У #{name} через #{days} дней День Рождения!"
+    when 7
+      "До  #{name} осталось #{days} дней !"
+    when 2..7
+      "Уже через #{days} дня у #{name} День Рождения!"
+    when 1
+      "День Рождения #{name} уже завтра!!!"
+    else
+      nil
+    end
   end
 
   def diff(date)
-    (Date.parse(date) - Date.parse(Time.now.to_s)).to_i % 365
+    (Date.parse(date.gsub(/\d{4}/, '2022')) - Date.parse(Time.now.to_s)).to_i
   end
 end

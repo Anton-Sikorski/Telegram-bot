@@ -8,5 +8,7 @@ class BirthdayBot
                                                                   callback_data: 'set_birthday')
     CONFIRM_SAVE = Telegram::Bot::Types::InlineKeyboardButton.new(text: 'Да', callback_data: 'save_data')
     DECLINE_SAVE = Telegram::Bot::Types::InlineKeyboardButton.new(text: 'Нет', callback_data: 'reset')
+    CHECK_DATES = Telegram::Bot::Types::InlineKeyboardButton.new(text: 'А когда праздники?',
+                                                                 callback_data: 'check_dates')
   end
 end

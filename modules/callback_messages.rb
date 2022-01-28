@@ -18,6 +18,19 @@ class BirthdayBot
           Response.delete_message(message_id)
         when 'save_data'
           save_data
+        when 'check_dates'
+          user_id = Listener.message.from.id
+          user_data = Database.select(user_id).map { |record| { id: user_id, name: record[1], date: record[2] } }
+          if user_data.empty?
+            Listener::Response.std_message('Вы пока не добавили ни одной записи!')
+          else
+            answer = ''
+            user_data.map do |record|
+              record[:date] = record[:date].gsub('.', '/')
+              answer += "У #{record[:name]} через #{(Date.parse(record[:date].gsub(/\d{4}/, '2022')) - Date.parse(Time.now.to_s)).to_i} дней День Рождения!\n"
+            end
+            Listener::Response.std_message answer
+          end
         end
       end
 
@@ -28,7 +41,7 @@ class BirthdayBot
         else
           answer = String.new
           data.each do |record|
-            answer += "День рождения #{record[1]} #{record[2]} числа.\n"
+            answer += "День рождения #{record[1]} - #{record[2]}.\n"
           end
           Listener::Response.std_message "Все записи: \n#{answer}"
         end

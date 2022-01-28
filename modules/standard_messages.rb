@@ -29,7 +29,8 @@ class BirthdayBot
         Response.inline_message 'Привет, выбери из доступных действий', Response.generate_inline_markup(
           [
             InlineButton::GET_BIRTHDAY,
-            InlineButton::SET_BIRTHDAY
+            InlineButton::SET_BIRTHDAY,
+            InlineButton::CHECK_DATES
           ]
         )
       end
