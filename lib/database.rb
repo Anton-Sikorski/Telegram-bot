@@ -13,7 +13,8 @@ module Database
         "create table #{TABLE_NAME}(
           user_id integer,
           name varchar(50),
-          date varchar(50)
+          date varchar(50),
+          id integer primary key autoincrement
         )"
       )
       true

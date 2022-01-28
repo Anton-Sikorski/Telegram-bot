@@ -4,15 +4,16 @@ class BirthdayBot
   module Listener
     # This module assigned to processing all standard messages
     module StandardMessages
-      STATES = %w[begin filled_name filled_date confirmed].freeze
-
+      ADD_STATES = %w[begin filled_name filled_date confirmed].freeze
+      EDIT_STATES = %W[begin edit_name edit_date confirmed]
       def process
         @message = Listener.message.text
-        State.save({ user_id: user_id, name: nil, date: nil, state: STATES[3] }) if State.check_state(user_id).nil?
+        State.save({ user_id: user_id, name: nil, date: nil, state: ADD_STATES[3] }) if State.check_state(user_id).nil?
 
         # Telegram::Bot::Types::ReplyKeyboardRemove.new(remove_keyboard: true)
 
-        if State.check_state(user_id)[:state] != STATES[3]
+        if State.check_state(user_id)[:state] != 'confirmed'
+          edit_record
           set_birthday
         else
           case @message
@@ -60,30 +61,33 @@ class BirthdayBot
 
         state = State.check_state(user_id).empty? ? nil : State.check_state(user_id)[:state]
 
-
         case state
-        when STATES[3]
-          change_state(STATES[0])
+        when ADD_STATES[3]
+          change_state(ADD_STATES[0])
           Response.inline_message 'Сообщи мне имя именинника', Response.generate_keyboard_markup(
             [
               KeyboardButton::RESET_SAVE
             ],
             true
           )
-        when STATES[0]
-          change_state(STATES[1], @message)
+        when ADD_STATES[0]
+          change_state(ADD_STATES[1], @message)
           Response.std_message 'Сообщи мене дату в формате дд/мм/гггг'
-        when STATES[1]
-          return Response.std_message 'Попробуй ещё!' unless valid_message?(@message)
+        when ADD_STATES[1]
+          return Response.std_message 'Попробуй ещё!' unless Listener::Security.valid_message?(@message)
 
           data = { name: State.check_state(user_id)[:name], date: @message }
-          change_state(STATES[2], State.check_state(user_id)[:name], @message.gsub('.', '/'))
+          change_state(ADD_STATES[2], State.check_state(user_id)[:name], @message.gsub('.', '/'))
           Response.inline_message "Вот что имеем:\nИмя - #{data[:name]}, дата рождения - #{data[:date]}\n", remove_keyboard
           confirm
         end
       end
 
-      def change_state(state = STATES[3], name = nil, date = nil)
+      def edit_record
+
+      end
+
+      def change_state(state = ADD_STATES[3], name = nil, date = nil)
         State.replace({ user_id: user_id, name: name, date: date, state: state })
       end
 
@@ -95,37 +99,12 @@ class BirthdayBot
         Telegram::Bot::Types::ReplyKeyboardRemove.new(remove_keyboard: true)
       end
 
-      def valid_message?(message)
-        unless message.match(%r{^\d{2}[./-]\d{2}[./-]\d{4}})
-          Response.std_message 'Неверный формат'
-          return false
-        end
-
-        day, months, year = message.gsub('.', '/').split('/').map(&:to_i)
-        if day > 31 || day < 1
-          Response.std_message 'Неверно указан день.'
-          return false
-        end
-
-        if months > 12 || months < 1
-          Response.std_message 'Неверно указан месяц.'
-          return false
-        end
-
-        if year > 2022 || year < 1921
-          Response.std_message 'Неверно указан год.'
-          return false
-        end
-
-        true
-      end
-
       module_function(
         :process,
-        :valid_message?,
         :confirm,
         :user_id,
         :change_state,
+        :edit_record,
         :remove_keyboard,
         :set_birthday,
         :start
