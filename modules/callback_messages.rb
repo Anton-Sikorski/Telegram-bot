@@ -18,6 +18,7 @@ class BirthdayBot
           Response.delete_message(message_id)
         when 'save_data'
           save_data
+          StandardMessages.start
         when 'check_dates'
           check_dates
         when 'edit_record'

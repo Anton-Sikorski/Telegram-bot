@@ -9,6 +9,7 @@ require './workers/remind_worker'
 require './modules/response'
 require './modules/callback_messages'
 require './modules/assets/inline_button'
+require './modules/assets/keyboard_button'
 require './modules/security'
 require './lib/state'
 

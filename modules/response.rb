@@ -36,9 +36,16 @@ class BirthdayBot
         )
       end
 
-      def generate_inline_markup(kb, force: false)
+      def generate_inline_markup(kbrd, force: false)
         Telegram::Bot::Types::InlineKeyboardMarkup.new(
-          inline_keyboard: kb
+          inline_keyboard: kbrd
+        )
+      end
+
+      def generate_keyboard_markup(kbrd, one_time = false, force: false)
+        Telegram::Bot::Types::ReplyKeyboardMarkup.new(
+          keyboard: kbrd,
+          one_time_keyboard: one_time
         )
       end
 
@@ -61,8 +68,7 @@ class BirthdayBot
         chat = chat_id if chat_id
         Listener.bot.api.deleteMessage(
           chat_id: chat,
-          message_id: message_id,
-          parse_mode: 'html'
+          message_id: message_id
         )
       end
 
@@ -75,6 +81,7 @@ class BirthdayBot
         :delete_message,
         :chat_id_defined?,
         :generate_inline_markup,
+        :generate_keyboard_markup,
         :inline_message,
         :force_reply_message
       )

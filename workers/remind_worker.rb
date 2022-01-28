@@ -15,7 +15,7 @@ class RemindWorker
     Database.setup('../lib/development.db')
     users = Database.ids
 
-    Telegram::Bot::Client.run(TelegramOrientedInfo::API_KEY) do |_bot|
+    Telegram::Bot::Client.run(TelegramOrientedInfo::API_KEY) do |bot|
       users.each do |user_id|
         user_data = Database.select(user_id).map { |record| { id: user_id, name: record[1], date: record[2] } }
         answer = user_data.map do |record|

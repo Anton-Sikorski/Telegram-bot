@@ -10,31 +10,35 @@ class BirthdayBot
         @message = Listener.message.text
         State.save({ user_id: user_id, name: nil, date: nil, state: STATES[3] }) if State.check_state(user_id).nil?
 
+        # Telegram::Bot::Types::ReplyKeyboardRemove.new(remove_keyboard: true)
+
         if State.check_state(user_id)[:state] != STATES[3]
           set_birthday
         else
           case @message
           when '/start', 'Привет'
             start
-          when '/set_birthday'
+          when '/set_birthday', 'Добавить запись'
             set_birthday
-          when '/birthdays'
+          when '/birthdays', 'Дни рождения'
             CallbackMessages.birthday
           when '/stop'
             Response.std_message 'Пока!'
             exit(1)
+          when 'А когда праздники?'
+            CallbackMessages.check_dates
           else
-            plug_message
+            Response.std_message 'Первый раз такое слышу, попробуй сказать что-то другое!'
           end
         end
       end
 
       def start
-        Response.inline_message 'Привет, выбери из доступных действий', Response.generate_inline_markup(
+        Response.inline_message 'Привет, выбери из доступных действий', Response.generate_keyboard_markup(
           [
-            InlineButton::GET_BIRTHDAY,
-            InlineButton::SET_BIRTHDAY,
-            InlineButton::CHECK_DATES
+            KeyboardButton::GET_BIRTHDAY,
+            KeyboardButton::SET_BIRTHDAY,
+            KeyboardButton::CHECK_DATES
           ]
         )
       end
@@ -49,17 +53,23 @@ class BirthdayBot
       end
 
       def set_birthday
-        if @message == '/reset'
+        if @message == '/reset' || @message == 'Отменить запись'
           change_state
-          return Response.std_message 'Запись отменена'
+          return Response.inline_message 'Запись отменена', remove_keyboard
         end
 
         state = State.check_state(user_id).empty? ? nil : State.check_state(user_id)[:state]
 
+
         case state
         when STATES[3]
           change_state(STATES[0])
-          Response.std_message 'Сообщи мне имя именинника'
+          Response.inline_message 'Сообщи мне имя именинника', Response.generate_keyboard_markup(
+            [
+              KeyboardButton::RESET_SAVE
+            ],
+            true
+          )
         when STATES[0]
           change_state(STATES[1], @message)
           Response.std_message 'Сообщи мене дату в формате дд/мм/гггг'
@@ -68,17 +78,9 @@ class BirthdayBot
 
           data = { name: State.check_state(user_id)[:name], date: @message }
           change_state(STATES[2], State.check_state(user_id)[:name], @message.gsub('.', '/'))
-          Response.std_message "Вот что имеем:\nИмя - #{data[:name]}, дата рождения - #{data[:date]}\n"
+          Response.inline_message "Вот что имеем:\nИмя - #{data[:name]}, дата рождения - #{data[:date]}\n", remove_keyboard
           confirm
         end
-      end
-
-      def birthdays
-        Response.std_message 'Вы ещё не добавили не одной записи!'
-      end
-
-      def plug_message
-        Response.std_message 'Первый раз такое слышу, попробуй сказать что-то другое!'
       end
 
       def change_state(state = STATES[3], name = nil, date = nil)
@@ -89,10 +91,16 @@ class BirthdayBot
         Listener.message.from.id
       end
 
-      def valid_message?(message)
-        return false unless message.match(%r{^\d{2}[./-]\d{2}[./-]\d{4}})
+      def remove_keyboard
+        Telegram::Bot::Types::ReplyKeyboardRemove.new(remove_keyboard: true)
+      end
 
-        # Response.std_message 'Неверный формат. Попробуй ещё!'
+      def valid_message?(message)
+        unless message.match(%r{^\d{2}[./-]\d{2}[./-]\d{4}})
+          Response.std_message 'Неверный формат'
+          return false
+        end
+
         day, months, year = message.gsub('.', '/').split('/').map(&:to_i)
         if day > 31 || day < 1
           Response.std_message 'Неверно указан день.'
@@ -114,12 +122,11 @@ class BirthdayBot
 
       module_function(
         :process,
-        :birthdays,
         :valid_message?,
         :confirm,
         :user_id,
         :change_state,
-        :plug_message,
+        :remove_keyboard,
         :set_birthday,
         :start
       )
