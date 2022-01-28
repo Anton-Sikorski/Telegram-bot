@@ -14,7 +14,7 @@ class BirthdayBot
           set_birthday
         else
           case @message
-          when '/start' || 'Привет'
+          when '/start', 'Привет'
             start
           when '/stop'
             Response.std_message 'Пока!'
@@ -50,7 +50,6 @@ class BirthdayBot
           return Response.std_message 'Отменяем запись'
         end
 
-        pp State.check_state(user_id)
         state = State.check_state(user_id).empty? ? nil : State.check_state(user_id)[:state]
 
         case state

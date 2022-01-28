@@ -36,7 +36,6 @@ class BirthdayBot
       # Start time variable, for exclude message what was sends before bot starts
       start_bot_time = Time.now.to_i
 
-      RemindWorker.perform_async
       # Active socket listener
       bot.listen do |message|
         # Processing the new income message    #if that message sent after bot run.
