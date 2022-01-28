@@ -20,6 +20,8 @@ class BirthdayBot
           save_data
         when 'check_dates'
           check_dates
+        when 'edit_record'
+          edit_record
         end
       end
 

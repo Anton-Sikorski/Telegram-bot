@@ -16,6 +16,10 @@ class BirthdayBot
           case @message
           when '/start', 'Привет'
             start
+          when '/set_birthday'
+            set_birthday
+          when '/birthdays'
+            CallbackMessages.birthday
           when '/stop'
             Response.std_message 'Пока!'
             exit(1)
