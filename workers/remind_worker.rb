@@ -31,6 +31,7 @@ class RemindWorker
           text: answer
         )
       end
+      puts "Success. Data sent at #{Time.now.strftime '%d-%m-%y %H%M'}"
     end
   end
 

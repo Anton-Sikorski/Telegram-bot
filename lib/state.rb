@@ -14,7 +14,8 @@ module State
           user_id integer primary key,
           name varchar(50),
           date varchar(50),
-          state varchar(50)
+          state varchar(50),
+          record_id integer
         )"
       )
       true
@@ -36,25 +37,26 @@ module State
 
   def replace(data)
     db.execute(
-      "REPLACE INTO #{TABLE_NAME} (user_id, name, date, state)
-      VALUES (?, ?, ?, ?)", [data[:user_id], data[:name], data[:date], data[:state]]
+      "REPLACE INTO #{TABLE_NAME} (user_id, name, date, state, record_id)
+      VALUES (?, ?, ?, ?, ?)", [data[:user_id], data[:name], data[:date], data[:state], data[:record_id]]
     )
   end
 
   # save valid data as row to database
   def save(data)
     db.execute(
-      "INSERT INTO #{TABLE_NAME} (user_id, name, date, state)
-      VALUES (?, ?, ?, ?)", [data[:user_id], data[:name], data[:date], data[:state]]
+      "INSERT INTO #{TABLE_NAME} (user_id, name, date, state, record_id)
+      VALUES (?, ?, ?, ?, ?)", [data[:user_id], data[:name], data[:date], data[:state], data[:id]]
     )
   end
 
   def check_state(user_id)
     db.execute("select * from #{TABLE_NAME} where user_id = #{user_id}") do |row|
-      return { 'id': row[0],
+      return { 'user_id': row[0],
                'name': row[1],
                'date': row[2],
-               'state': row[3] }
+               'state': row[3],
+               'record_id': row[4] }
     end
   end
 

@@ -48,7 +48,7 @@ class BirthdayBot
         Database.save(user_id: user_id, name: data[:name], date: data[:date])
         Response.std_message 'Успех!'
         # resetting status of user
-        State.replace({ user_id: user_id, name: nil, date: nil, state: AddBirthday::ADD_STATES[3] })
+        State.replace({ user_id: user_id, name: nil, date: nil, state: 'confirmed' })
         Response.delete_message(message_id)
       end
 

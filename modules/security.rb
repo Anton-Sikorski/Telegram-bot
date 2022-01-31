@@ -16,7 +16,7 @@ class BirthdayBot
         message_delay > (5 * 60)
       end
 
-      def valid_message?(message)
+      def valid_record?(message)
         unless message.match(%r{^\d{2}[./-]\d{2}[./-]\d{4}})
           Response.std_message 'Неверный формат'
           return false
@@ -42,7 +42,7 @@ class BirthdayBot
       end
 
       module_function(
-        :valid_message?,
+        :valid_record?,
         :message_is_new,
         :message_too_far
       )

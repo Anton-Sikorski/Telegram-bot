@@ -8,12 +8,12 @@ class BirthdayBot
 
       def set_birthday
         message = Listener.message.text
-        if ['/reset', 'Отменить запись'].include?(message)
+        if ['/reset', 'Отменить действие'].include?(message)
           change_state
           return Response.inline_message 'Запись отменена', Response.remove_keyboard
         end
 
-        state = State.check_state(user_id).empty? ? nil : State.check_state(user_id)[:state]
+        state = State.check_state(user_id)[:state]
 
         case state
         when ADD_STATES[3]
@@ -28,7 +28,7 @@ class BirthdayBot
           change_state(ADD_STATES[1], message)
           Response.std_message 'Сообщи мене дату в формате дд/мм/гггг'
         when ADD_STATES[1]
-          return Response.std_message 'Попробуй ещё!' unless Listener::Security.valid_message?(message)
+          return Response.std_message 'Попробуй ещё!' unless Listener::Security.valid_record?(message)
 
           data = { name: State.check_state(user_id)[:name], date: message }
           change_state(ADD_STATES[2], State.check_state(user_id)[:name], message.gsub('.', '/'))

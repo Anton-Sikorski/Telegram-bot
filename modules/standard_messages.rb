@@ -17,6 +17,8 @@ class BirthdayBot
           case message
           when '/start', 'Привет'
             start
+          when '/edit_record', 'Изменить запись'
+            EditRecord.edit_record
           when '/set_birthday', 'Добавить запись'
             AddBirthday.set_birthday
           when '/birthdays', 'Дни рождения'
@@ -31,8 +33,8 @@ class BirthdayBot
           end
         elsif AddBirthday::ADD_STATES.any?(state)
           AddBirthday.set_birthday
-          # elsif EDIT_STATES.any?(state)
-          #   edit_record
+        elsif EditRecord::EDIT_STATES.any?(state)
+          EditRecord.edit_record
         end
       end
 
