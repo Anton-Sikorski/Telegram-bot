@@ -43,7 +43,8 @@ class BirthdayBot
           [
             KeyboardButton::GET_BIRTHDAY,
             KeyboardButton::SET_BIRTHDAY,
-            KeyboardButton::CHECK_DATES
+            KeyboardButton::CHECK_DATES,
+            KeyboardButton::EDIT_RECORD
           ]
         )
       end

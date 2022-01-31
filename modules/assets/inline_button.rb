@@ -3,12 +3,13 @@
 class BirthdayBot
   # This module assigned to creating InlineKeyboardButton
   module InlineButton
-    GET_BIRTHDAY = Telegram::Bot::Types::InlineKeyboardButton.new(text: 'Дни рождения', callback_data: 'birthday')
-    SET_BIRTHDAY = Telegram::Bot::Types::InlineKeyboardButton.new(text: 'Добавить запись',
-                                                                  callback_data: 'set_birthday')
     CONFIRM_SAVE = Telegram::Bot::Types::InlineKeyboardButton.new(text: 'Да', callback_data: 'save_data')
     DECLINE_SAVE = Telegram::Bot::Types::InlineKeyboardButton.new(text: 'Нет', callback_data: 'reset')
-    CHECK_DATES = Telegram::Bot::Types::InlineKeyboardButton.new(text: 'А когда праздники?',
-                                                                 callback_data: 'check_dates')
+    EDIT_NAME =  Telegram::Bot::Types::InlineKeyboardButton.new(text: 'Имя', callback_data: 'edit_name')
+    EDIT_DATE =  Telegram::Bot::Types::InlineKeyboardButton.new(text: 'Дату', callback_data: 'edit_date')
+    DELETE_RECORD = Telegram::Bot::Types::InlineKeyboardButton.new(text: 'Удалить запись',
+                                                                   callback_data: 'delete_record')
+    CONFIRM_EDIT = Telegram::Bot::Types::InlineKeyboardButton.new(text: 'Да', callback_data: 'confirm_edit')
+    DECLINE_EDIT = Telegram::Bot::Types::InlineKeyboardButton.new(text: 'Нет', callback_data: 'reset')
   end
 end

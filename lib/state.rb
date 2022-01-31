@@ -46,7 +46,7 @@ module State
   def save(data)
     db.execute(
       "INSERT INTO #{TABLE_NAME} (user_id, name, date, state, record_id)
-      VALUES (?, ?, ?, ?, ?)", [data[:user_id], data[:name], data[:date], data[:state], data[:id]]
+      VALUES (?, ?, ?, ?, ?)", [data[:user_id], data[:name], data[:date], data[:state], data[:record_id]]
     )
   end
 
@@ -62,9 +62,9 @@ module State
 
   # Get all from the selected table
   def get_table(table_name)
-    db.execute <<-SQL
-    Select * from #{table_name}
-    SQL
+    db.execute(
+      "Select * from #{table_name}"
+    )
   rescue SQLite3::SQLException
     false
   end

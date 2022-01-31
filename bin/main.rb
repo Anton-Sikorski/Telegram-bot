@@ -7,12 +7,12 @@ require './lib/database'
 require './modules/listener'
 require './modules/response'
 require './modules/security'
-require './modules/edit_record'
-require './modules/add_birthday'
 require './workers/remind_worker'
 require './modules/standard_messages'
 require './modules/callback_messages'
 require './modules/assets/inline_button'
+require './modules/dialogues/edit_record'
+require './modules/dialogues/add_birthday'
 require './modules/assets/keyboard_button'
 
 # basic class of the app
@@ -45,7 +45,7 @@ class BirthdayBot
           # Processing the new income message    #if that message sent after bot run.
           Listener.catch_new_message(message, bot) if Listener::Security.message_is_new(start_bot_time, message)
         rescue Telegram::Bot::Exceptions::ResponseError => e
-          puts "#{Time.now}) Telegram response error \n#{e}"
+          puts "#{Time.now.strftime '%d%m %H%M%S'}) Telegram response error \n#{e}"
         end
       end
     end

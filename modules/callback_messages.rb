@@ -14,7 +14,7 @@ class BirthdayBot
         when 'set_birthday'
           Listener::AddBirthday.set_birthday
         when 'reset'
-          State.replace({ user_id: Listener.message.from.id, name: nil, date: nil,
+          State.replace({ user_id: user_id, name: nil, date: nil,
                           state: 'confirmed' })
           Response.delete_message(message_id)
           StandardMessages.start
@@ -24,7 +24,31 @@ class BirthdayBot
         when 'check_dates'
           check_dates
         when 'edit_record'
-          edit_record
+          EditRecord.edit_record
+        when 'edit_name'
+          data = State.check_state(user_id)
+          State.replace({ user_id: user_id, name: data[:name], date: data[:date],
+                          state: EditRecord::EDIT_STATES[2], record_id: data[:record_id] })
+          Response.std_message 'Введите имя:'
+          Response.delete_message(message_id)
+        when 'edit_date'
+          data = State.check_state(user_id)
+          State.replace({ user_id: user_id, name: data[:name], date: data[:date],
+                          state: EditRecord::EDIT_STATES[3], record_id: data[:record_id] })
+          Response.std_message 'Введите дату:'
+          Response.delete_message(message_id)
+        when 'delete_record'
+          Database.delete_record(State.check_state(user_id)[:record_id])
+          Response.delete_message(message_id)
+          Response.std_message 'Успешно удалено!'
+          State.replace({ user_id: user_id, name: nil, date: nil,
+                          state: 'confirmed' })
+          StandardMessages.start
+        when 'confirm_edit'
+          Database.replace(State.check_state(user_id))
+          State.replace({ user_id: user_id, name: nil, date: nil,
+                          state: 'confirmed' })
+          StandardMessages.start
         end
       end
 
@@ -77,8 +101,13 @@ class BirthdayBot
         days.negative? ? 365 + days.to_i : days
       end
 
+      def user_id
+        Listener.message.from.id
+      end
+
       module_function(
         :process,
+        :user_id,
         :save_data,
         :message_id,
         :birthdays,

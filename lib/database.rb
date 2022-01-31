@@ -42,12 +42,29 @@ module Database
     )
   end
 
+  def replace(data)
+    db.execute(
+      "REPLACE INTO #{TABLE_NAME} (user_id, name, date, id)
+      VALUES (?, ?, ?, ?)", [data[:user_id], data[:name], data[:date], data[:record_id]]
+    )
+  end
+
+  def delete_record(record_id)
+    db.execute(
+      "DELETE FROM #{TABLE_NAME} WHERE id = #{record_id}"
+    )
+  end
+
   def select(user_id)
     db.execute("select * from #{TABLE_NAME} where user_id = #{user_id}").map { |row| row }
   end
 
   def select_by_id(id)
-    db.execute("select * from #{TABLE_NAME} where id = #{id}").map { |row| row }
+    db.execute("select * from #{TABLE_NAME} where id = #{id}").map do |row|
+      { 'user_id': row[0],
+        'name': row[1],
+        'date': row[2] }
+    end
   end
 
   # Get all from the selected table
@@ -65,7 +82,9 @@ module Database
 
   module_function(
     :select_by_id,
+    :delete_record,
     :get_table,
+    :replace,
     :select,
     :setup,
     :ids,
