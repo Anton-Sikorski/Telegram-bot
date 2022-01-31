@@ -10,12 +10,12 @@ class BirthdayBot
         self.callback_message = Listener.message.message
         case Listener.message.data
         when 'birthday'
-          birthday
+          birthdays
         when 'set_birthday'
           Listener::AddBirthday.set_birthday
         when 'reset'
           State.replace({ user_id: Listener.message.from.id, name: nil, date: nil,
-                          state: AddBirthday::ADD_STATES[3] })
+                          state: 'confirmed' })
           Response.delete_message(message_id)
           StandardMessages.start
         when 'save_data'
@@ -28,7 +28,7 @@ class BirthdayBot
         end
       end
 
-      def birthday
+      def birthdays
         data = Database.select(Listener.message.from.id)
         if data.empty?
           Listener::Response.std_message('Вы пока не добавили ни одной записи!')
@@ -73,14 +73,15 @@ class BirthdayBot
       end
 
       def time_diff(date)
-        (Date.parse(date.gsub(/\d{4}/, '2022')) - Date.parse(Time.now.to_s)).to_i
+        days = (Date.parse(date.gsub(/\d{4}/, '2022')) - Date.parse(Time.now.to_s)).to_i
+        days.negative? ? 365 + days.to_i : days
       end
 
       module_function(
         :process,
         :save_data,
         :message_id,
-        :birthday,
+        :birthdays,
         :check_dates,
         :time_diff,
         :callback_message,

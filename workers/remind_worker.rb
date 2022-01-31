@@ -19,7 +19,7 @@ class RemindWorker
       users.each do |user_id|
         user_data = Database.select(user_id).map { |record| { id: user_id, name: record[1], date: record[2] } }
         answer = user_data.map do |record|
-          days_left = diff(record[:date])
+          days_left = time_diff(record[:date])
           respond(record[:name], days_left)
         end.compact.join('\n')
 
@@ -40,14 +40,17 @@ class RemindWorker
       "У #{name} через #{days} дней День Рождения!"
     when 7, 14, 21
       "До Дня Рождения #{name} осталось #{days} дней !"
-    when 2..7
+    when 5..7
+      "Уже через #{days} дней у #{name} День Рождения!"
+    when 2..5
       "Уже через #{days} дня у #{name} День Рождения!"
     when 1
       "День Рождения #{name} уже завтра!!!"
     end
   end
 
-  def diff(date)
-    (Date.parse(date.gsub(/\d{4}/, '2022')) - Date.parse(Time.now.to_s)).to_i
+  def time_diff(date)
+    days = (Date.parse(date.gsub(/\d{4}/, '2022')) - Date.parse(Time.now.to_s)).to_i
+    days.negative? ? 365 + days.to_i : days
   end
 end

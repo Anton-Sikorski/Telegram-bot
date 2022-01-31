@@ -46,6 +46,10 @@ module Database
     db.execute("select * from #{TABLE_NAME} where user_id = #{user_id}").map { |row| row }
   end
 
+  def select_by_id(id)
+    db.execute("select * from #{TABLE_NAME} where id = #{id}").map { |row| row }
+  end
+
   # Get all from the selected table
   def get_table(table_name)
     db.execute <<-SQL
@@ -60,6 +64,7 @@ module Database
   end
 
   module_function(
+    :select_by_id,
     :get_table,
     :select,
     :setup,

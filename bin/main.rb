@@ -25,10 +25,10 @@ class BirthdayBot
     State.setup
     Database.setup
     # Establishing webhook via @gem telegram/bot, using API-KEY
-    begin
+    loop do
       listen
     rescue Faraday::ConnectionFailed
-      puts 'Retrying...'
+      puts "#{Time.now}) Connection failed"
       retry
     end
   end
@@ -39,9 +39,14 @@ class BirthdayBot
       start_bot_time = Time.now.to_i
 
       # Active socket listener
-      bot.listen do |message|
-        # Processing the new income message    #if that message sent after bot run.
-        Listener.catch_new_message(message, bot) if Listener::Security.message_is_new(start_bot_time, message)
+      bot.listen do |rqst|
+        Thread.start(rqst) do |message|
+          # Processing the new income message    #if that message sent after bot run.
+          Listener.catch_new_message(message, bot) if Listener::Security.message_is_new(start_bot_time, message)
+        rescue Telegram::Bot::Exceptions::ResponseError
+          puts "#{Time.now}) Telegram response error"
+          retry
+        end
       end
     end
   end
