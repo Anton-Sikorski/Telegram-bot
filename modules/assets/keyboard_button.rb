@@ -12,5 +12,7 @@ class BirthdayBot
                                                           callback_data: 'check_dates')
     EDIT_RECORD = Telegram::Bot::Types::KeyboardButton.new(text: 'Изменить запись',
                                                            callback_data: 'edit_records')
+    NOTIFICATIONS = Telegram::Bot::Types::KeyboardButton.new(text: 'Оповещения',
+                                                             callback_data: 'notifications')
   end
 end

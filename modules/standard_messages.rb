@@ -28,6 +28,8 @@ class BirthdayBot
             exit(1)
           when 'А когда праздники?'
             CallbackMessages.check_dates
+          when 'Оповещения'
+            Notifications.state
           else
             Response.std_message 'Первый раз такое слышу, попробуй сказать что-то другое!'
           end
@@ -41,10 +43,11 @@ class BirthdayBot
       def start
         Response.inline_message 'Выбери из доступных действий', Response.generate_keyboard_markup(
           [
-            KeyboardButton::GET_BIRTHDAY,
-            KeyboardButton::SET_BIRTHDAY,
-            KeyboardButton::CHECK_DATES,
-            KeyboardButton::EDIT_RECORD
+            [KeyboardButton::GET_BIRTHDAY,
+             KeyboardButton::SET_BIRTHDAY],
+            [KeyboardButton::CHECK_DATES,
+             KeyboardButton::NOTIFICATIONS],
+            [KeyboardButton::EDIT_RECORD]
           ]
         )
       end

@@ -45,6 +45,7 @@ class BirthdayBot
       def generate_keyboard_markup(kbrd, one_time = false, force: false)
         Telegram::Bot::Types::ReplyKeyboardMarkup.new(
           keyboard: kbrd,
+          resize_keyboard: true,
           one_time_keyboard: one_time
         )
       end

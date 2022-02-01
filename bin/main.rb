@@ -3,6 +3,7 @@
 require 'telegram/bot'
 require './lib/keys'
 require './lib/state'
+require './lib/users'
 require './lib/database'
 require './modules/listener'
 require './modules/response'
@@ -13,17 +14,20 @@ require './modules/callback_messages'
 require './modules/assets/inline_button'
 require './modules/dialogues/edit_record'
 require './modules/dialogues/add_birthday'
+require './modules/dialogues/notifications'
 require './modules/assets/keyboard_button'
 
 # basic class of the app
 class BirthdayBot
   include Database
   include State
+  include Users
 
   def initialize
     super
     # Initialize BD
     State.setup
+    Users.setup
     Database.setup
     # Establishing webhook via @gem telegram/bot, using API-KEY
     loop do

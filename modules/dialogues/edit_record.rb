@@ -10,7 +10,7 @@ class BirthdayBot
         message = Listener.message.text
         if ['/reset', 'Отменить действие'].include?(message)
           change_state
-          return Response.inline_message 'Редактирование отменено', Response.remove_keyboard
+          return Response.inline_message 'Редактирование отменено', StandardMessages.start
         end
 
         state = State.check_state(user_id)[:state]
@@ -55,14 +55,6 @@ class BirthdayBot
           change_state('confirmed', data[:record_id],
                        data[:name], message.gsub('.', '/'))
           confirm
-          # when EDIT_STATES[1]
-          #   return Response.std_message 'Попробуй ещё!' unless Listener::Security.valid_message?(message)
-          #
-          #   data = { name: State.check_state(user_id)[:name], date: message }
-          #   change_state(EDIT_STATES[2], State.check_state(user_id)[:name], message.gsub('.', '/'))
-          #   Response.inline_message "Вот что имеем:\nИмя - #{data[:name]}, дата рождения - #{data[:date]}\n",
-          #                           Response.remove_keyboard
-          #   confirm
         end
       end
 
