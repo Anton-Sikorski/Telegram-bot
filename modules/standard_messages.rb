@@ -6,7 +6,6 @@ class BirthdayBot
     module StandardMessages
       def process
         message = Listener.message.text
-        user_id = Listener.message.from.id
         if State.check_state(user_id).nil?
           State.save({ user_id: user_id, name: nil, date: nil,
                        state: 'confirmed' })
@@ -22,12 +21,12 @@ class BirthdayBot
           when '/set_birthday', 'Добавить запись'
             AddBirthday.set_birthday
           when '/birthdays', 'Дни рождения'
-            CallbackMessages.birthdays
+            Birthdays.birthdays
           when '/stop'
             Response.std_message 'Пока!'
             exit(1)
           when 'А когда праздники?'
-            CallbackMessages.check_dates
+            Birthdays.check_dates
           when 'Оповещения'
             Notifications.state
           else
@@ -52,8 +51,13 @@ class BirthdayBot
         )
       end
 
+      def user_id
+        Listener.message.from.id
+      end
+
       module_function(
         :process,
+        :user_id,
         :start
       )
     end

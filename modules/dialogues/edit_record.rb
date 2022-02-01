@@ -44,6 +44,31 @@ class BirthdayBot
         end
       end
 
+      def edit_name
+        data = State.check_state(user_id)
+        State.replace({ user_id: user_id, name: data[:name], date: data[:date],
+                        state: EditRecord::EDIT_STATES[2], record_id: data[:record_id] })
+        Response.std_message 'Введите имя:'
+        Response.delete_message(message_id)
+      end
+
+      def edit_date
+        data = State.check_state(user_id)
+        State.replace({ user_id: user_id, name: data[:name], date: data[:date],
+                        state: EditRecord::EDIT_STATES[3], record_id: data[:record_id] })
+        Response.std_message 'Введите дату:'
+        Response.delete_message(message_id)
+      end
+
+      def delete_record
+        Database.delete_record(State.check_state(user_id)[:record_id])
+        Response.delete_message(message_id)
+        Response.std_message 'Успешно удалено!'
+        State.replace({ user_id: user_id, name: nil, date: nil,
+                        state: 'confirmed' })
+        StandardMessages.start
+      end
+
       def confirm
         Response.inline_message 'Сохраняем?', Response.generate_inline_markup(
           [
@@ -51,6 +76,13 @@ class BirthdayBot
             InlineButton::DECLINE_EDIT
           ]
         )
+      end
+
+      def confirm_edit
+        Database.replace(State.check_state(user_id))
+        State.replace({ user_id: user_id, name: nil, date: nil,
+                        state: 'confirmed' })
+        StandardMessages.start
       end
 
       def choice
@@ -67,6 +99,10 @@ class BirthdayBot
         State.replace({ user_id: user_id, record_id: id, name: name, date: date, state: state })
       end
 
+      def message_id
+        Listener.message.message.message_id
+      end
+
       def user_records
         Database.select(user_id)
       end
@@ -76,12 +112,17 @@ class BirthdayBot
       end
 
       module_function(
+        :choice,
         :user_id,
         :confirm,
-        :choice,
+        :edit_date,
+        :edit_name,
+        :message_id,
+        :edit_record,
+        :confirm_edit,
         :change_state,
         :user_records,
-        :edit_record
+        :delete_record
       )
     end
   end

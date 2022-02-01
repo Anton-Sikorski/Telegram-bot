@@ -14,5 +14,7 @@ class BirthdayBot
                                                            callback_data: 'edit_records')
     NOTIFICATIONS = Telegram::Bot::Types::KeyboardButton.new(text: 'Оповещения',
                                                              callback_data: 'notifications')
+    YES = Telegram::Bot::Types::KeyboardButton.new(text: 'Да')
+    NO = Telegram::Bot::Types::KeyboardButton.new(text: 'Нет')
   end
 end
