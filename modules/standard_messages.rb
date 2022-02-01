@@ -41,7 +41,7 @@ class BirthdayBot
       end
 
       def start
-        Response.inline_message 'Выбери из доступных действий', Response.generate_keyboard_markup(
+        Response.inline_message 'Выберите из доступных действий', Response.generate_keyboard_markup(
           [
             [KeyboardButton::GET_BIRTHDAY,
              KeyboardButton::SET_BIRTHDAY],

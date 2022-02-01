@@ -19,41 +19,27 @@ class BirthdayBot
         when 'confirmed'
           change_state(EDIT_STATES[0])
           Response.inline_message "Выберите номер записи для изменения:\n#{
-            user_records.map.with_index do |record, index|
-              "#{index + 1}) #{record[1]}"
-            end.join("\n")}", Response.generate_keyboard_markup(
-              [
-                KeyboardButton::RESET_SAVE
-              ],
-              true
-            )
+            user_records.map.with_index { |record, index| "#{index + 1}) #{record[1]}" }.join("\n")}",
+                                  Response.generate_keyboard_markup([KeyboardButton::RESET_SAVE], true)
         when EDIT_STATES[0]
           unless message.match(/\d+/) && message.to_i <= user_records.size && !message.to_i.negative?
             return Response.std_message 'Нет такой записи. Попробуй ещё!'
           end
 
           record_id = message.to_i - 1
-          change_state(EDIT_STATES[1], user_records[record_id][3],
-                       user_records[record_id][1], user_records[record_id][2])
-          Response.inline_message 'Что бы вы хотели изменить?', Response.generate_inline_markup(
-            [
-              InlineButton::EDIT_DATE,
-              InlineButton::EDIT_NAME,
-              InlineButton::DELETE_RECORD
-            ]
-          )
+          change_state(EDIT_STATES[1], user_records[record_id][3], user_records[record_id][1],
+                       user_records[record_id][2])
+          choice
         when EDIT_STATES[2]
           data = State.check_state(user_id)
           pp message.to_s
-          change_state('confirmed', data[:record_id],
-                       message, data[:date])
+          change_state('confirmed', data[:record_id], message, data[:date])
           confirm
         when EDIT_STATES[3]
           return Response.std_message 'Попробуй ещё!' unless Listener::Security.valid_record?(message)
 
           data = State.check_state(user_id)
-          change_state('confirmed', data[:record_id],
-                       data[:name], message.gsub('.', '/'))
+          change_state('confirmed', data[:record_id], data[:name], message.gsub('.', '/'))
           confirm
         end
       end
@@ -63,6 +49,16 @@ class BirthdayBot
           [
             InlineButton::CONFIRM_EDIT,
             InlineButton::DECLINE_EDIT
+          ]
+        )
+      end
+
+      def choice
+        Response.inline_message 'Что бы вы хотели изменить?', Response.generate_inline_markup(
+          [
+            InlineButton::EDIT_DATE,
+            InlineButton::EDIT_NAME,
+            InlineButton::DELETE_RECORD
           ]
         )
       end
@@ -82,6 +78,7 @@ class BirthdayBot
       module_function(
         :user_id,
         :confirm,
+        :choice,
         :change_state,
         :user_records,
         :edit_record
