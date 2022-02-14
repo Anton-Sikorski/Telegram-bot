@@ -25,9 +25,9 @@ module Database
     )
   end
 
-  def setup
+  def setup(db_path = './lib/development.db')
     # Initializing database file
-    self.db = SQLite3::Database.open './lib/development.db'
+    self.db = SQLite3::Database.open db_path
 
     # Try to get custom table, if table not exists - create this one
     Create.database unless get_table(TABLE_NAME)
@@ -54,10 +54,15 @@ module Database
     false
   end
 
+  def ids
+    db.execute("select user_id from #{TABLE_NAME}").uniq.flatten
+  end
+
   module_function(
     :get_table,
     :select,
     :setup,
+    :ids,
     :save,
     :db,
     :db=
