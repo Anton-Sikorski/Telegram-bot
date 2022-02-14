@@ -3,18 +3,19 @@
 # responsible for interactions with database
 module Database
   attr_accessor :db
+
   TABLE_NAME = 'birthdays'
   require 'sqlite3'
   # creates Database
   module Create
     def database
-      Database.db.execute <<~SQL
-        create table birthdays(
+      Database.db.execute(
+        "create table #{TABLE_NAME}(
           user_id integer,
           name varchar(50),
           date varchar(50)
-        );
-      SQL
+        )"
+      )
       true
     rescue SQLite3::SQLException
       false
@@ -24,9 +25,9 @@ module Database
     )
   end
 
-  def setup
+  def setup(db_path = './lib/development.db')
     # Initializing database file
-    self.db = SQLite3::Database.open './lib/development.db'
+    self.db = SQLite3::Database.open db_path
 
     # Try to get custom table, if table not exists - create this one
     Create.database unless get_table(TABLE_NAME)
@@ -40,12 +41,8 @@ module Database
     )
   end
 
-  def select
-    data = []
-    db.execute("select * from #{TABLE_NAME}") do |row|
-      data << row
-    end
-    data
+  def select(user_id)
+    db.execute("select * from #{TABLE_NAME} where user_id = #{user_id}").map { |row| row }
   end
 
   # Get all from the selected table
@@ -57,10 +54,15 @@ module Database
     false
   end
 
+  def ids
+    db.execute("select user_id from #{TABLE_NAME}").uniq.flatten
+  end
+
   module_function(
     :get_table,
     :select,
     :setup,
+    :ids,
     :save,
     :db,
     :db=

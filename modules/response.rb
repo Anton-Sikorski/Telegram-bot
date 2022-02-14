@@ -5,7 +5,7 @@ class BirthdayBot
     # This module assigned to responses from bot
     module Response
       def std_message(message, chat_id: false)
-        chat = defined?(Listener.message.chat.id) ? Listener.message.chat.id : Listener.message.message.chat.id
+        chat = chat_id_defined?
         chat = chat_id if chat_id
         Listener.bot.api.send_message(
           parse_mode: 'html',
@@ -15,9 +15,9 @@ class BirthdayBot
       end
 
       def inline_message(message, inline_markup, editless: false, chat_id: false)
-        chat = defined?(Listener.message.chat.id) ? Listener.message.chat.id : Listener.message.message.chat.id
+        chat = chat_id_defined?
         chat = chat_id if chat_id
-        
+
         if editless
           return Listener.bot.api.edit_message_text(
             chat_id: chat,
@@ -27,7 +27,7 @@ class BirthdayBot
             reply_markup: inline_markup
           )
         end
-        
+
         Listener.bot.api.send_message(
           chat_id: chat,
           parse_mode: 'html',
@@ -43,7 +43,7 @@ class BirthdayBot
       end
 
       def force_reply_message(text, chat_id: false)
-        chat = defined?(Listener.message.chat.id) ? Listener.message.chat.id : Listener.message.message.chat.id
+        chat = chat_id_defined?
         chat = chat_id if chat_id
         Listener.bot.api.send_message(
           parse_mode: 'html',
@@ -56,8 +56,24 @@ class BirthdayBot
         )
       end
 
+      def delete_message(message_id, chat_id: false)
+        chat = chat_id_defined?
+        chat = chat_id if chat_id
+        Listener.bot.api.deleteMessage(
+          chat_id: chat,
+          message_id: message_id,
+          parse_mode: 'html'
+        )
+      end
+
+      def chat_id_defined?
+        defined?(Listener.message.chat.id) ? Listener.message.chat.id : Listener.message.message.chat.id
+      end
+
       module_function(
         :std_message,
+        :delete_message,
+        :chat_id_defined?,
         :generate_inline_markup,
         :inline_message,
         :force_reply_message
@@ -65,4 +81,3 @@ class BirthdayBot
     end
   end
 end
-
