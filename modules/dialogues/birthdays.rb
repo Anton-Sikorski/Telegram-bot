@@ -4,16 +4,6 @@ class BirthdayBot
   module Listener
     # contains methods to create new record
     module Birthdays
-      def birthdays
-        data = Database.select(user_id)
-
-        return Listener::Response.std_message('Вы пока не добавили ни одной записи!') if data.empty?
-
-        answer = data.sort { |a, b| time_diff(a[2]) <=> time_diff(b[2]) }.map do |record|
-          "День рождения #{record[1]} - #{record[2]}."
-        end.join("\n")
-        Listener::Response.std_message "Все записи: \n#{answer}"
-      end
 
       def save_data
         data = State.check_state(user_id)
@@ -27,16 +17,27 @@ class BirthdayBot
         StandardMessages.start
       end
 
-      def check_dates
+      def dates(message)
         user_data = Database.select(user_id).map { |record| { id: user_id, name: record[1], date: record[2] } }
+                            .sort { |a, b| time_diff(a[:date]) <=> time_diff(b[:date]) }
 
         return Listener::Response.std_message('Вы пока не добавили ни одной записи!') if user_data.empty?
 
-        answer = user_data.sort { |a, b| time_diff(a[:date]) <=> time_diff(b[:date]) }.map do |record|
-          "У #{record[:name]} через #{time_diff(record[:date])} дней День Рождения!"
-        end.join("\n")
-
+        case message
+        when 'check_dates'
+          answer = user_data.map { |user| "У #{name_form(user[:name])} через #{time_diff(user[:date])} дней День Рождения!" }.join("\n")
+        when 'birthdays'
+          answer = user_data.map { |user| "День рождения #{name_form(user[:name])} - #{user[:date]}." }.join("\n")
+        end
         Listener::Response.std_message answer
+      end
+
+      def birthdays
+        dates 'birthdays'
+      end
+
+      def check_dates
+        dates 'check_dates'
       end
 
       def time_diff(date)
@@ -52,13 +53,26 @@ class BirthdayBot
         Listener.message.from.id
       end
 
+      def name_form(name)
+        return name if name.split('').any?(/[a-z]/)
+
+        first_name, second_name = name.split(' ')
+
+        Petrovich(
+          firstname: first_name,
+          lastname: second_name
+        ).genitive.to_s
+      end
+
       module_function(
         :check_dates,
         :message_id,
+        :name_form,
         :time_diff,
         :save_data,
         :birthdays,
-        :user_id
+        :user_id,
+        :dates
       )
     end
   end
