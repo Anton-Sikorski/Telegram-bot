@@ -16,7 +16,38 @@ class BirthdayBot
         message_delay > (5 * 60)
       end
 
+      def valid_name?(message)
+        !message.nil?
+      end
+
+      def valid_date?(message)
+        unless message.match(%r{^\d{2}[./-]\d{2}[./-]\d{4}})
+          Response.std_message 'Неверный формат'
+          return false
+        end
+
+        day, months, year = message.gsub('.', '/').split('/').map(&:to_i)
+        if day > 31 || day < 1
+          Response.std_message 'Неверно указан день.'
+          return false
+        end
+
+        if months > 12 || months < 1
+          Response.std_message 'Неверно указан месяц.'
+          return false
+        end
+
+        if year > 2022 || year < 1921
+          Response.std_message 'Неверно указан год.'
+          return false
+        end
+
+        true
+      end
+
       module_function(
+        :valid_date?,
+        :valid_name?,
         :message_is_new,
         :message_too_far
       )

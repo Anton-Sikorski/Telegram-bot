@@ -1,4 +1,5 @@
 :schedule:
   remind_worker:
-    cron: '0 */30 * * * *'   # Runs once per minute
+    every: ['24h', first_in: '0s']
+    # cron: '0 */30 * * * *'    Runs once per 30 minutes
     class: RemindWorker
