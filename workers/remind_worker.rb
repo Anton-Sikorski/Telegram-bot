@@ -3,6 +3,7 @@
 require 'sidekiq'
 require 'sidekiq-scheduler'
 require 'telegram/bot'
+require 'petrovich'
 require_relative '../lib/database'
 require_relative '../lib/keys'
 require_relative 'config/config'
@@ -38,6 +39,7 @@ class RemindWorker
   end
 
   def respond(name, days)
+    name = name_form(name)
     case days
     when 30
       "У #{name} через #{days} дней День Рождения!"
@@ -52,6 +54,17 @@ class RemindWorker
     when 0
       "Сегодня День Рождения #{name}! Не забудьте написать поздравление!"
     end
+  end
+
+  def name_form(name)
+    return name if name.split('').any?(/[a-z]/)
+
+    first_name, second_name = name.split(' ')
+
+    Petrovich(
+      firstname: first_name,
+      lastname: second_name
+    ).genitive.to_s
   end
 
   def time_diff(date)

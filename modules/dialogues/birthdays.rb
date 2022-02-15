@@ -25,9 +25,11 @@ class BirthdayBot
 
         case message
         when 'check_dates'
-          answer = user_data.map { |user| "У #{name_form(user[:name])} через #{time_diff(user[:date])} дней День Рождения!" }.join("\n")
+          answer = user_data.map { |record| "У #{name_form(record[:name])} через #{time_diff(record[:date])} дней День Рождения!" }.join("\n")
         when 'birthdays'
-          answer = user_data.map { |user| "День рождения #{name_form(user[:name])} - #{user[:date]}." }.join("\n")
+          answer = user_data.map { |record| "День рождения #{name_form(record[:name])} - #{record[:date]}." }.join("\n")
+        else
+          answer = 'Method Error'
         end
         Listener::Response.std_message answer
       end
