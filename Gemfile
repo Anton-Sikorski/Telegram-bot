@@ -4,6 +4,7 @@ source 'https://rubygems.org'
 
 gem 'json'
 gem 'net-http-persistent', '~> 2.9'
+gem 'petrovich'
 gem 'sidekiq'
 gem 'sidekiq-scheduler'
 gem 'sqlite3'

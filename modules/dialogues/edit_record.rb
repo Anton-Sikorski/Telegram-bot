@@ -14,6 +14,7 @@ class BirthdayBot
         end
 
         state = State.check_state(user_id)[:state]
+        user_records = Database.select(user_id)
 
         case state
         when 'confirmed'
@@ -22,21 +23,20 @@ class BirthdayBot
             user_records.map.with_index { |record, index| "#{index + 1}) #{record[1]}" }.join("\n")}",
                                   Response.generate_keyboard_markup([KeyboardButton::RESET_SAVE], true)
         when EDIT_STATES[0]
-          unless message.match(/\d+/) && message.to_i <= user_records.size && !message.to_i.negative?
-            return Response.std_message 'Нет такой записи. Попробуй ещё!'
-          end
+          return Response.std_message 'Нет такой записи. Попробуй ещё!' unless record_exist?(message)
 
           record_id = message.to_i - 1
           change_state(EDIT_STATES[1], user_records[record_id][3], user_records[record_id][1],
                        user_records[record_id][2])
           choice
         when EDIT_STATES[2]
+          return Response.std_message 'Попробуй ещё!' unless Security.valid_name?(message)
+
           data = State.check_state(user_id)
-          pp message.to_s
           change_state('confirmed', data[:record_id], message, data[:date])
           confirm
         when EDIT_STATES[3]
-          return Response.std_message 'Попробуй ещё!' unless Listener::Security.valid_record?(message)
+          return Response.std_message 'Попробуй ещё!' unless Security.valid_date?(message)
 
           data = State.check_state(user_id)
           change_state('confirmed', data[:record_id], data[:name], message.gsub('.', '/'))
@@ -47,7 +47,7 @@ class BirthdayBot
       def edit_name
         data = State.check_state(user_id)
         State.replace({ user_id: user_id, name: data[:name], date: data[:date],
-                        state: EditRecord::EDIT_STATES[2], record_id: data[:record_id] })
+                        state: EDIT_STATES[2], record_id: data[:record_id] })
         Response.std_message 'Введите имя:'
         Response.delete_message(message_id)
       end
@@ -55,7 +55,7 @@ class BirthdayBot
       def edit_date
         data = State.check_state(user_id)
         State.replace({ user_id: user_id, name: data[:name], date: data[:date],
-                        state: EditRecord::EDIT_STATES[3], record_id: data[:record_id] })
+                        state: EDIT_STATES[3], record_id: data[:record_id] })
         Response.std_message 'Введите дату:'
         Response.delete_message(message_id)
       end
@@ -64,8 +64,7 @@ class BirthdayBot
         Database.delete_record(State.check_state(user_id)[:record_id])
         Response.delete_message(message_id)
         Response.std_message 'Успешно удалено!'
-        State.replace({ user_id: user_id, name: nil, date: nil,
-                        state: 'confirmed' })
+        State.replace({ user_id: user_id, name: nil, date: nil, state: 'confirmed' })
         StandardMessages.start
       end
 
@@ -80,8 +79,7 @@ class BirthdayBot
 
       def confirm_edit
         Database.replace(State.check_state(user_id))
-        State.replace({ user_id: user_id, name: nil, date: nil,
-                        state: 'confirmed' })
+        State.replace({ user_id: user_id, name: nil, date: nil, state: 'confirmed' })
         StandardMessages.start
       end
 
@@ -95,16 +93,16 @@ class BirthdayBot
         )
       end
 
+      def record_exist?(message)
+        message.match(/\d+/) && message.to_i <= Database.select(user_id).size && !message.to_i.negative?
+      end
+
       def change_state(state = 'confirmed', id = nil, name = nil, date = nil)
         State.replace({ user_id: user_id, record_id: id, name: name, date: date, state: state })
       end
 
       def message_id
         Listener.message.message.message_id
-      end
-
-      def user_records
-        Database.select(user_id)
       end
 
       def user_id
@@ -121,7 +119,7 @@ class BirthdayBot
         :edit_record,
         :confirm_edit,
         :change_state,
-        :user_records,
+        :record_exist?,
         :delete_record
       )
     end

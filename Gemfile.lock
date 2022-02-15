@@ -45,6 +45,7 @@ GEM
     json (2.6.1)
     multipart-post (2.1.1)
     net-http-persistent (2.9.4)
+    petrovich (1.1.4)
     raabro (1.4.0)
     rack (2.2.3)
     redis (4.5.1)
@@ -84,6 +85,7 @@ PLATFORMS
 DEPENDENCIES
   json
   net-http-persistent (~> 2.9)
+  petrovich
   sidekiq
   sidekiq-scheduler
   sqlite3

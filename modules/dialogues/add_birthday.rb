@@ -25,10 +25,12 @@ class BirthdayBot
             true
           )
         when ADD_STATES[0]
+          return Response.std_message 'Попробуй ещё!' unless Listener::Security.valid_name?(message)
+
           change_state(ADD_STATES[1], message)
           Response.std_message 'Сообщи мене дату в формате дд/мм/гггг'
         when ADD_STATES[1]
-          return Response.std_message 'Попробуй ещё!' unless Listener::Security.valid_record?(message)
+          return Response.std_message 'Попробуй ещё!' unless Listener::Security.valid_date?(message)
 
           data = { name: State.check_state(user_id)[:name], date: message }
           change_state(ADD_STATES[2], State.check_state(user_id)[:name], message.gsub('.', '/'))

@@ -39,6 +39,10 @@ class BirthdayBot
         StandardMessages.start
       end
 
+      def message_id
+        Listener.message.message.message_id
+      end
+
       def user_id
         Listener.message.from.id
       end
@@ -47,6 +51,7 @@ class BirthdayBot
         :reset,
         :process,
         :user_id,
+        :message_id,
         :callback_message,
         :callback_message=
       )

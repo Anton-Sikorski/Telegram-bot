@@ -22,9 +22,6 @@ class BirthdayBot
             AddBirthday.set_birthday
           when '/birthdays', 'Дни рождения'
             Birthdays.birthdays
-          when '/stop'
-            Response.std_message 'Пока!'
-            exit(1)
           when 'А когда праздники?'
             Birthdays.check_dates
           when 'Оповещения'
